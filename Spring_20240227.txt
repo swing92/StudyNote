@@ -1,0 +1,43 @@
+Spring 2024.02.27
+
+xml파일의 종류와 역할
+
+1.pom.xml(POM : Project Object Model)
+	> Maven의 빌드 정보
+	> 프로젝트 내 빌드 옵션 설정
+	
+2.web.xml
+	> WAS 최초 구동 시 가장 먼저 읽음
+	> web에서 사용하는 다양한 설정들을 하는 곳
+	> Web Application 설정을 위한 Deployment descriptor(배포설명자) 라고도 함
+	> client에게 요청을 받아올 때 web.xml에 정의되어있는 URL이 client요청 URL과 매핑이 되는 경우
+		>> DispatcherServlet이 이 요청을 가로채가 서비스를 제공하도록 함
+		
+3.servlet.xml(servlet-context.xml이랑 같은가?)
+	> client의 요청을 받기 위한 컨텍스트 설정
+	> 요청과 관련된 객체를 정의
+	> url과 관련된 Controller, annotation, ViewResolver(컨트롤러에서 view정보에 대해 설정하는 것), Interceptor, MultipartResolver 등을 설정
+	
+4.root-context.xml
+	> view와 관련되지 '않은' 객체를 정의 (view와 관련된 객체들은 servlet-context.xml에서)
+	> Service, Repository(DAO), DB 등 비즈니스 로직과 관련된 설정
+
+	tip)servlet-context와 root-context의 차이점
+		> servlet-context : 여기 등록되는 Bean들은 servlet-container에만 사용
+		> root-context : 여기 등록되는 Bean들은 모든 context에 사용 가능(공유 가능)
+
+5.mapper.xml
+	> SQL 쿼리 작성
+	
+6.mybatis-config.xml
+
+
+
+Spring에서 Service의 역할
+	> Dao가 DB에서 받아온 데이터를 전달받아 가공
+	
+
+Dao가 DB에 접근하고 mapper에 선언되어있는 sql문들을 활용해서 데이터를 가져오고
+	> Service에 전달해서 Service가 가공하고 그걸
+		> Controller에 줘서 얘가 이렇게저렇게 처리한걸 jsp로 넘겨서 view로 출력
+	

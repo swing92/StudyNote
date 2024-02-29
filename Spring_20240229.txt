@@ -1,0 +1,70 @@
+Spring 2024.02.29
+
+*Connection Pool
+	> Connection은 네트워크 상의 연결 자체를 의미
+	> 보통 Connection 하나당 트랜잭션 하나를 관리
+		> 트랜잭션은 하나 이상의 쿼리에서 동일한 Connection 객체를 공유하는 것을 의미
+	> Connection 객체 각각을 직접 웹 애플리케이션에서 이용하면 체계적인 관리가 힘듦
+	> Connection 객체를 프로그램이 실행될 때마다 생성하는 것이 아니라, 웹 애플리케이션이 서비스되기 전에 웹 서버에 미리 생성하여 준비
+	> 필요할 때 준비된 Connection을 가져다 사용함으로 JDBC프로그래밍 문제점들 개선
+	> DriverManager.getConnction() : 실제 자바프로그램과 데이터베이스를 네트워크상에서 연결해주는 메소드
+	
+*Datasource
+	> Connection Pool을 어플리케이션 단에서 어떻게 관리할지를 구현하는 인터페이스
+		> javax.sql.DataSource라는 인터페이스가 Connection Pool을 관리하는 목적으로 사용되고
+		> Application에서는 이 Datasource 인터페이스를 통해 Connection을 얻어오고 반납하는 등의 작업을 구현
+	> 기존의 DriverManager를 이용한 방식은 내부적으로 ststic한 필드 사용
+		> 스레드 환경에서 바람직하지X
+			> 되도록 DataSource 이용
+
+
+★JDBC & DBCP & JNDI
+
+1.JDBC(Java DataBase Connectivity)
+	> 데이터베이스를 조작하는 표준 SQL 인터페이스 API
+	> 인터페이스 기반으로 구축 (데이터베이스 커넥션 인터페이스)
+	> 이론 : 각 DBMS에 맞는 JDBC를 받아주면 쉽게 DBMS 변경 가능
+			tip) DBMS : 데이터베이스 관리 시스템(DataBase Management System)
+						다수의 사용자들이 데이터베이스 내의 데이터를 접근할 수 있도록 해주는 소프트웨어 도구의 집합
+	> 현실 : 일반적인 JDBC는 DataBase Pool 방식을 사용하지 않고 DB에서 정보를 가져올 때마다 매 번 DB연결을 열고닫아서 비효율적(클라이언트의 요청 시점에 Connection을 연결)
+	> 상용 어플에서 JDBC방식을 사용하는 경우는 거의 없음
+	
+2.DBCP(DataBase Connection Pool)
+	> Application을 시작할 때 원하는 만큼 커넥션 객체를 만들어놓고 Pool에 넣어놓은 채 필요할 때마다 가져다 쓰고 다시 반납하는 방식
+	> Connection Pool : 미리 일정수의 Connection을 만들어놓고 필요한 어플리케이션에 전달하여 이용하는 방법
+	> 다중스레드를 스레드풀로 관리하는 것과 비슷
+	> DataBase Connection Pool을 Applicaion 소스단에 설정
+
+3.JNDI(Java Naming and Directory Interface)
+	> WAS단에 데이터베이스 커넥션 객체를 미리 네이밍해두는 방식
+	> DB커넥션을 WAS단에서 제어, 서버에서 하나의 커넥션 풀을 가짐 (like 공유객체 사용)
+	> Application이 DB에 직접 Connection을 요청X
+	> JNDI lookup을 통해 Datasource 객체를 획득, Connection요청
+	> DB 설정 정보를 파악하기 쉬움(WAS단에 설정정보를 통해 DB가 몇 개 붙어있는지 정보를 파악하기 수월)
+	> DB 커넥션 풀을 효율적으로 사용 가능
+	> JDBC와의 차이점 ★☆중요★☆ : 하드코딩X, JNDI는 재활용을 하기 위한 코드, 부하가 발생하지 않게 하기위해 JNDI를 써야함!
+
+
+*SqlSession VS SqlSessionTemplate
+	> 역할은 같으나 트랜잭션 처리가 다름
+	> SqlSession은 commit()/rollback() 메소드를 명시적으로 호출해 트랜잭션을 처리
+	> SqlSessionTemplate은 Spring이 트랜잭션을 대신 처리해서 commit()/rollback() 메소드 호출 불가
+	
+*트랜잭션(Transaction)
+	> 데이터베이스의 상태를 변화시키기 위해 수행하는 작업의 단위
+	> 작업의 단위가 질의어 한 문장이라는 뜻은 아님! 주의!!
+	> 예를 들면 사용자가 게시글을 작성하고 올리기 버튼을 누른 후 다시 게시판으로 돌아온다면 사용자는 자신이 작성한 글이 포함된 업데이트된 게시판을 보게 됨
+	  이 경우 작업의 단위는 insert문(게시글올리기)과 select문(최신화 된 게시판 보여주기)을 합친 것이 됨
+	  그리고 이 작업단위가 하나의 트랜잭션이 됨
+	> 트랜잭션의 특징 : 원자성(Atomicity) - 트랜잭션이 DB에 모두 반영되던가, 아니면 전혀 반영되지 않아야 한다는 것
+										(논리적인 작업단위로서, 일처리는 작업단위별로 이루어져야 사람이 다루는데 무리가 없음)
+					  일관성(Consistency) - 트랜잭션의 작업 처리 결과가 항상 일관성이 있어야 한다는 것
+										   트랜잭션이 진행되는 동안에 DB가 변경되더라도 처음에 트랜잭션을 진행하기 위해 참조한 DB로 진행됨
+					  독립성(Isolation) - 둘 이상의 트랜잭션이 동시에 실행되고 있는 경우, 어떤 하나의 트랜잭션이라도 다른 트랜잭션의 연산에 끼어들 수 없다는 것
+										 하나의 특정 트랜잭션이 완료될때까지, 다른 트랜잭션이 특정 트랜잭션의 결과를 참조할 수 없음
+					  지속성(Durability) - 트랜잭션이 성공적으로 완료된 경우 결과는 영구적으로 반영되어야 한다는 점
+	> 트랜잭션의 Commit과 Rollback
+		> Commit : 하나의 트랜잭션이 성공적으로 끝났고 데이터베이스가 일관성 있는 상태에 있을 때 하나의 트랜잭션이 끝났다는 것을 알려주기 위해 사용하는 연산
+				   수행했던 트랜잭션이 로그에 저장되고, 후에 Rollback 연산을 수행했었던 트랜잭션 단위로 하는 것을 도와줌
+		> Rollback : 하나의 트랜잭션 처리가 비정상적으로 종료되어 트랜잭션의 원자성이 깨진 경우 트랜잭션을 처음부터 다시 시작하거나 트랜잭션의 부분적으로만 연산된 결과를 다시 취소시킴
+					 후에 사용자가 트랜잭션 처리 된 단위대로 Rollback을 진행할 수도 있음

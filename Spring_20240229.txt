@@ -68,3 +68,27 @@ Spring 2024.02.29
 				   수행했던 트랜잭션이 로그에 저장되고, 후에 Rollback 연산을 수행했었던 트랜잭션 단위로 하는 것을 도와줌
 		> Rollback : 하나의 트랜잭션 처리가 비정상적으로 종료되어 트랜잭션의 원자성이 깨진 경우 트랜잭션을 처음부터 다시 시작하거나 트랜잭션의 부분적으로만 연산된 결과를 다시 취소시킴
 					 후에 사용자가 트랜잭션 처리 된 단위대로 Rollback을 진행할 수도 있음
+
+
+★@RequestMapping Annotation이 적용된 메소드의 파라미터와 반환 타입
+
+1.Controller 메소드의 <<파라미터>> 타입으로 지정할 수 있는 객체와 Annotation
+	> HttpServletRequest, HttpServletResponse : 요청/응답을 처리하기 위한 서블릿 API
+	> HttpSession : HTTP 세션을 위한 서블릿 API
+	> org.springframework.ui.Model, ModelMap, java.util.Map : 뷰에 모델 데이터를 전달하기 위한 모델 객체
+	> 커맨드 객체(VO, DTO) : 요청 데이터를 저정할 객체
+	> Errors, BindingResult : 검증 결과를 저장할 객체, 커맨드 객체 바로 뒤에 위치시켜야 함
+	> @RequestParam : HTTP 요청 파라미터의 값을 매소드의 파라미터로 mapping하기 위한 Annotation
+	> @RequestHeader : HTTP 요청 헤더의 값을 파라미터로 받기 위한 Annotation
+	> @RequestCookie : Cookie 데이터를 파라미터로 받기 위한 Annotation
+	> @RequestVariable : RESTful API 방식의 파라미터를 받기 위한 경로 변수 설정 Annotation
+	> @RequestBody : 요청 몸체의 데이터를 자바 객체로 변환하기 위한 Annotation
+					 String이나 JSON으로 넘어오는 요청 몸체의 데이터를 자바 객체로 변환하기 위한 Annotation
+	> Writer, OutputStream : 응답 데이터를 직접 작성할 때 메소드의 파라미터로 지정해 사용
+	
+2.Controller 메소드의 <<반환>> 타입으로 지정할 수 있는 객체와 Annotation
+	> String : 뷰 이름을 반환할 때
+	> void : 컨트롤러의 메소드에서 직접 응답 데이터를 작성할 경우
+	> ModelAndView : 모델과 뷰 정보를 함께 반환해야 할 경우
+	> 자바 객체 : 메소드에 @ResponseBody가 적용된 경우나
+				 메소드에서 반환되는 객체를 JSON이나 XML과 같은 양식으로 변환하여 응답할 경우에 사용

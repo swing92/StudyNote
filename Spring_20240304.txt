@@ -1,0 +1,19 @@
+Spring 2024.03.04
+
+Spring Legacy Project의 구조
+1.Java Resourses
+	> src/main/java : 작성되는 코드의 경로
+	> src/main/resources : 실행할 때 참고하는 기본 경로(주로 설정 파일들)
+	> src/test/java : 테스트 코드를 넣는 경로
+	> src/test/resources : 테스트 관련 설정 파일 보관 경로
+	
+2.werbapp/resources
+	> src/main/webapp/resources : images, css, js 등 컨트롤러를 거치지 않을 파일들 보관 경로
+								  Spring Controller를 거치지 않을 파일들은 webapp폴더 안에 보관
+
+3.WEB-INF
+	> spring/appServlet/servlet-context.xml : 웹과 관련된 스프링 설정 파일
+	> spring/appServlet/root-context.xml : 스프링 설정 파일
+	> views : 템플릿 프로젝트의 jsp 파일 경로(실제 화면에서 보이는 페이지들을 이 곳에 보관)
+	
+4.pom.xml : Maven이 사용하는 pom.xml
